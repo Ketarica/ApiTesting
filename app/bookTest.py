@@ -5,35 +5,30 @@ app = FastAPI()
 
 books_db = {
     1: {
-        "id": "1",
         "title": "Neuromancer",
         "author": "William Gibson",
         "genre": "Cyberpunk",
         "year": 1984,
     },
     2: {
-        "id": "2",
         "title": "Snow Crash",
         "author": "Neal Stephenson",
         "genre": "Cyberpunk",
         "year": 1992,
     },
     3: {
-        "id": "3",
         "title": "Do Androids Dream of Electric Sheep?",
         "author": "Philip K. Dick",
         "genre": "Science Fiction",
         "year": 1968,
     },
     4: {
-        "id": "4",
         "title": "The Three-Body Problem",
         "author": "Liu Cixin",
         "genre": "Hard Sci-Fi",
         "year": 2006,
     },
     5: {
-        "id": "5",
         "title": "The Hobbit",
         "author": "J. R. R. Tolkien",
         "genre": "Fantasy",
