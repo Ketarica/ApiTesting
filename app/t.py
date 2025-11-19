@@ -1,8 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List
-from fastapi import FastAPI, Form
 
 app = FastAPI()
 
@@ -47,37 +45,13 @@ class Book(BaseModel):
     year: int
 
 
-@app.get("/books")
-def list_books():
-    return books_db
+@app.get("/books", response_model=List[Book])
+async def get_all():
+    return [Book(**v) for v in books_db.values()]
 
 
-@app.get("/books/{book_id}")
-def get_book(book_id: int):
+@app.get("/books/{book_id}", response_model=Book)
+async def get_books_by_id(book_id: int):
     if book_id not in books_db:
         raise HTTPException(status_code=404, detail="Book not found")
-    return books_db[book_id]
-
-
-@app.post("/books/{book_id}")
-def add_book(book_id: int, book: Book):
-    if book_id in books_db:
-        raise HTTPException(status_code=400, detail="Book already exists")
-    books_db[book_id] = book.model_dump()
-    return {"status": "created", "book": book}
-
-
-@app.put("/books/{book_id}")
-def update_book(book_id: int, book: Book):
-    if book_id not in books_db:
-        raise HTTPException(status_code=404, detail="Book not found")
-    books_db[book_id] = book.model_dump()
-    return {"status": "created", "book": book}
-
-
-@app.delete("/books/{book_id}")
-def delete_book(book_id: int):
-    if book_id not in books_db:
-        raise HTTPException(status_code=404, detail="Book not found")
-    del books_db[book_id]
-    return {"status": "deleted"}
+    return Book(**books_db[book_id])
