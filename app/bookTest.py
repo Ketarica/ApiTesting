@@ -141,15 +141,14 @@ books_db: Dict[int, dict] = {
 
 
 class BookBase(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200, example="Neuromancer")
-    author: str = Field(..., min_length=1, max_length=100, example="William Gibson")
-    genre: str = Field(..., min_length=1, max_length=50, example="Cyberpunk")
-    year: int = Field(..., ge=0, lt=10000, example=1984)  # базовые ограничения
+    title: str = Field(..., title="base_title", min_length=1, max_length=200)
+    author: str = Field(..., title="base_author", min_length=1, max_length=100)
+    genre: str = Field(..., title="base_genre", min_length=1, max_length=50)
+    year: int = Field(..., title="base_year", ge=0, lt=10000)
 
-    @field_validator("title", "author", "genre")
+    # @field_validator("title", "author", "genre")
     @classmethod
     def strip_strings(cls, v: str) -> str:
-        # убираем лишние пробелы вокруг
         return v.strip()
 
     @field_validator("year")
@@ -164,25 +163,16 @@ class BookBase(BaseModel):
 
 
 class BookCreate(BookBase):
-    """
-    Модель для запроса создания книги.
-    Нужна, чтобы явно отделить входные данные (без id) от возвращаемой модели.
-    """
-
     pass
 
 
 class BookUpdate(BaseModel):
-    """
-    Модель для частичного обновления. Все поля опциональны.
-    """
+    title: Optional[str] = Field(title="book_update_title", min_length=1, max_length=200)
+    author: Optional[str] = Field(title="book_update_author", min_length=1, max_length=100)
+    genre: Optional[str] = Field(title="book_update_genre", min_length=1, max_length=50)
+    year: Optional[int] = Field(title="book_update_year", ge=0, lt=10000)
 
-    title: Optional[str] = Field(None, min_length=1, max_length=200)
-    author: Optional[str] = Field(None, min_length=1, max_length=100)
-    genre: Optional[str] = Field(None, min_length=1, max_length=50)
-    year: Optional[int] = Field(None, ge=0, lt=10000)
-
-    @field_validator("title", "author", "genre", mode="before")
+    # @field_validator("title", "author", "genre", mode="before")
     @classmethod
     def strip_opt_strings(cls, v):
         if v is None:
@@ -203,16 +193,11 @@ class BookUpdate(BaseModel):
 
 
 class Book(BookBase):
-    """
-    Модель, возвращаемая клиенту. Дополнена id.
-    """
-
-    id: int = Field(..., example=1)
+    id: int = Field(...)
 
 
 @app.get("/books", response_model=dict)
 def list_books():
-    # возвращаем "сырую" БД словаря — в реальном приложении лучше сериализовывать модели
     return books_db
 
 
@@ -240,17 +225,11 @@ def update_book(book_id: int, book: BookUpdate):
     if book_id not in books_db:
         raise HTTPException(status_code=404, detail="Book not found")
 
-    # текущая запись
     current = books_db[book_id].copy()
-
-    # получаем словарь только с заданными полями (те, которые не None)
     updates = {k: v for k, v in book.model_dump().items() if v is not None}
-
-    # если ничего не пришло — вернуть текущее состояние (или можно выбросить ошибку)
     if not updates:
         return Book(id=book_id, **current)
 
-    # применяем изменения
     current.update(updates)
     books_db[book_id] = current
     out = current.copy()
