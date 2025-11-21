@@ -167,8 +167,12 @@ class BookCreate(BookBase):
 
 
 class BookUpdate(BaseModel):
-    title: Optional[str] = Field(title="book_update_title", min_length=1, max_length=200)
-    author: Optional[str] = Field(title="book_update_author", min_length=1, max_length=100)
+    title: Optional[str] = Field(
+        title="book_update_title", min_length=1, max_length=200
+    )
+    author: Optional[str] = Field(
+        title="book_update_author", min_length=1, max_length=100
+    )
     genre: Optional[str] = Field(title="book_update_genre", min_length=1, max_length=50)
     year: Optional[int] = Field(title="book_update_year", ge=0, lt=10000)
 
