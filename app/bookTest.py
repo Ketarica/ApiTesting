@@ -100,7 +100,7 @@
 
 from typing import Optional, Dict
 from datetime import date
-
+from fastapi import Query
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
@@ -200,9 +200,24 @@ class Book(BookBase):
     id: int = Field(...)
 
 
-@app.get("/books", response_model=dict)
-def list_books():
-    return books_db
+@app.get("/books", response_model=Dict[int, BookBase])
+def list_books(
+    author: Optional[str] = None,
+    year: Optional[int] = None,
+    genre: Optional[str] = None,
+):
+    if author is None and year is None and genre is None:
+        return books_db
+    filtered_books = {}
+    for book_id, book_data in books_db.items():
+        if author is not None and book_data["author"] != author:
+            continue
+        if year is not None and book_data["year"] != year:
+            continue
+        if genre is not None and book_data["genre"] != genre:
+            continue
+        filtered_books[book_id] = book_data
+    return filtered_books
 
 
 @app.get("/books/{book_id}", response_model=Book)
