@@ -137,6 +137,66 @@ books_db: Dict[int, dict] = {
         "genre": "Fantasy",
         "year": 1937,
     },
+    6: {
+        "title": "Dune",
+        "author": "Frank Herbert",
+        "genre": "Science Fiction",
+        "year": 1965,
+    },
+    7: {
+        "title": "Fahrenheit 451",
+        "author": "Ray Bradbury",
+        "genre": "Dystopian",
+        "year": 1953,
+    },
+    8: {
+        "title": "1984",
+        "author": "George Orwell",
+        "genre": "Dystopian",
+        "year": 1949,
+    },
+    9: {
+        "title": "Foundation",
+        "author": "Isaac Asimov",
+        "genre": "Science Fiction",
+        "year": 1951,
+    },
+    10: {
+        "title": "The Hitchhiker's Guide to the Galaxy",
+        "author": "Douglas Adams",
+        "genre": "Science Fiction",
+        "year": 1979,
+    },
+    11: {
+        "title": "A Game of Thrones",
+        "author": "George R. R. Martin",
+        "genre": "Fantasy",
+        "year": 1996,
+    },
+    12: {
+        "title": "The Martian",
+        "author": "Andy Weir",
+        "genre": "Hard Sci-Fi",
+        "year": 2011,
+    },
+    13: {
+        "title": "Brave New World",
+        "author": "Aldous Huxley",
+        "genre": "Dystopian",
+        "year": 1932,
+    },
+    14: {
+        "title": "Harry Potter and the Philosopher's Stone",
+        "author": "J. K. Rowling",
+        "genre": "Fantasy",
+        "year": 1997,
+    },
+    15: {
+        "title": "Altered Carbon",
+        "author": "Richard K. Morgan",
+        "genre": "Cyberpunk",
+        "year": 2002,
+    },
 }
 
 
@@ -198,6 +258,12 @@ class BookUpdate(BaseModel):
 
 class Book(BookBase):
     id: int = Field(...)
+
+
+@app.get("/books_pag/")
+async def read_item(skip: int = 0, limit: int = 5):
+    all_books = list(books_db.values())
+    return all_books[skip : skip + limit]
 
 
 @app.get("/books", response_model=Dict[int, BookBase])
